@@ -1,7 +1,16 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import './style.css'
+import gsap from 'gsap'
+import * as dat from 'lil-gui'
+
+const parameters = {
+    color: 0xff0000,
+    spin: () =>
+    {
+        gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2 })
+    }
+}
 
 /**
  * Base
@@ -16,14 +25,33 @@ const scene = new THREE.Scene()
  * Object
  */
 const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+const material = new THREE.MeshBasicMaterial({ color: parameters.color })
 const mesh = new THREE.Mesh(geometry, material)
 scene.add(mesh)
 
 /**
+ * Debug
+ */
+const gui = new dat.GUI({ closed: true })
+gui
+    .add(mesh.position, 'y')
+    .min(- 3)
+    .max(3)
+    .step(0.01)
+    .name('elevation')
+gui.add(mesh, 'visible')
+gui.add(material, 'wireframe')
+gui
+.addColor(parameters, 'color')
+.onChange(() =>
+{
+    material.color.set(parameters.color)
+})
+gui.add(parameters, 'spin')
+
+/**
  * Sizes
  */
-// Sizes
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
@@ -31,7 +59,7 @@ const sizes = {
 
 window.addEventListener('resize', () =>
 {
-   // Update sizes
+    // Update sizes
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
 
@@ -43,35 +71,6 @@ window.addEventListener('resize', () =>
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
-
-window.addEventListener('dblclick', () =>
-{
-    const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement
-
-    if(!fullscreenElement)
-    {
-        if(canvas.requestFullscreen)
-        {
-            canvas.requestFullscreen()
-        }
-        else if(canvas.webkitRequestFullscreen)
-        {
-            canvas.webkitRequestFullscreen()
-        }
-    }
-    else
-    {
-        if(document.exitFullscreen)
-        {
-            document.exitFullscreen()
-        }
-        else if(document.webkitExitFullscreen)
-        {
-            document.webkitExitFullscreen()
-        }
-    }
-})
-
 
 /**
  * Camera
@@ -92,6 +91,7 @@ const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 })
 renderer.setSize(sizes.width, sizes.height)
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 /**
  * Animate
