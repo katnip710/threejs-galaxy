@@ -5,12 +5,36 @@ import gsap from 'gsap'
 import * as dat from 'lil-gui'
 
 const parameters = {
-    color: 0xff0000,
     spin: () =>
     {
         gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2 })
     }
 }
+
+
+/**
+ * Textures
+ */
+const loadingManager = new THREE.LoadingManager()
+loadingManager.onStart = () =>
+{
+    console.log('loading started')
+}
+loadingManager.onLoad = () =>
+{
+    console.log('loading finished')
+}
+loadingManager.onProgress = () =>
+{
+    console.log('loading progressing')
+}
+loadingManager.onError = () =>
+{
+    console.log('loading error')
+}
+const textureLoader = new THREE.TextureLoader(loadingManager)
+const colorTexture = textureLoader.load('/textures/minecraft.png')
+colorTexture.magFilter = THREE.NearestFilter
 
 /**
  * Base
@@ -25,14 +49,14 @@ const scene = new THREE.Scene()
  * Object
  */
 const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial({ color: parameters.color })
+const material = new THREE.MeshBasicMaterial({ map: colorTexture })
 const mesh = new THREE.Mesh(geometry, material)
 scene.add(mesh)
 
 /**
  * Debug
  */
-const gui = new dat.GUI({ closed: true })
+const gui = new dat.GUI({ width: 300 })
 gui
     .add(mesh.position, 'y')
     .min(- 3)
@@ -41,13 +65,8 @@ gui
     .name('elevation')
 gui.add(mesh, 'visible')
 gui.add(material, 'wireframe')
-gui
-.addColor(parameters, 'color')
-.onChange(() =>
-{
-    material.color.set(parameters.color)
-})
 gui.add(parameters, 'spin')
+
 
 /**
  * Sizes
@@ -77,7 +96,9 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.z = 3
+camera.position.x = 1
+camera.position.y = 1
+camera.position.z = 1
 scene.add(camera)
 
 // Controls
@@ -107,6 +128,9 @@ const tick = () =>
 
     // Render
     renderer.render(scene, camera)
+
+    // Update objects
+    mesh.rotation.y += 0.005
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
