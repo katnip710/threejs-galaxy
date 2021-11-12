@@ -15,3 +15,8 @@ body {
     outline: none;
 }
 
+.lil-gui {
+	background-color: rgb(83, 190, 240);
+	color: rgb(0, 0, 0);
+	padding: 20px;
+}

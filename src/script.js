@@ -5,12 +5,15 @@ import gsap from 'gsap'
 import * as dat from 'lil-gui'
 
 const parameters = {
-    spin: () =>
+    spinX: () =>
     {
         gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2 })
-    }
+    },
+    spinY: () =>
+    {
+        gsap.to(mesh.rotation, { duration: 1, x: mesh.rotation.y + Math.PI * 1 })
+    },
 }
-
 
 /**
  * Textures
@@ -34,6 +37,7 @@ loadingManager.onError = () =>
 }
 const textureLoader = new THREE.TextureLoader(loadingManager)
 const colorTexture = textureLoader.load('/textures/minecraft.png')
+//const colorTexture = textureLoader.load('/textures/checkerboard-8x8.png')
 colorTexture.magFilter = THREE.NearestFilter
 
 /**
@@ -65,7 +69,8 @@ gui
     .name('elevation')
 gui.add(mesh, 'visible')
 gui.add(material, 'wireframe')
-gui.add(parameters, 'spin')
+gui.add(parameters, 'spinX')
+gui.add(parameters, 'spinY')
 
 
 /**
@@ -131,6 +136,7 @@ const tick = () =>
 
     // Update objects
     mesh.rotation.y += 0.005
+    camera.lookAt(mesh.position)
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
