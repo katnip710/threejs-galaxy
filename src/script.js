@@ -1,48 +1,14 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import gsap from 'gsap'
 import * as dat from 'lil-gui'
-
-const parameters = {
-    spinX: () =>
-    {
-        gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2 })
-    },
-    spinY: () =>
-    {
-        gsap.to(mesh.rotation, { duration: 1, x: mesh.rotation.y + Math.PI * 1 })
-    },
-}
-
-/**
- * Textures
- */
-const loadingManager = new THREE.LoadingManager()
-loadingManager.onStart = () =>
-{
-    console.log('loading started')
-}
-loadingManager.onLoad = () =>
-{
-    console.log('loading finished')
-}
-loadingManager.onProgress = () =>
-{
-    console.log('loading progressing')
-}
-loadingManager.onError = () =>
-{
-    console.log('loading error')
-}
-const textureLoader = new THREE.TextureLoader(loadingManager)
-const colorTexture = textureLoader.load('/textures/minecraft.png')
-//const colorTexture = textureLoader.load('/textures/checkerboard-8x8.png')
-colorTexture.magFilter = THREE.NearestFilter
 
 /**
  * Base
  */
+// Debug
+const gui = new dat.GUI()
+
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
@@ -50,28 +16,44 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 /**
- * Object
+ * Textures
  */
-const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial({ map: colorTexture })
-const mesh = new THREE.Mesh(geometry, material)
-scene.add(mesh)
+const textureLoader = new THREE.TextureLoader()
+const particleTexture = textureLoader.load('/textures/particles/2.png')
 
 /**
- * Debug
+ * Particles
  */
-const gui = new dat.GUI({ width: 300 })
-gui
-    .add(mesh.position, 'y')
-    .min(- 3)
-    .max(3)
-    .step(0.01)
-    .name('elevation')
-gui.add(mesh, 'visible')
-gui.add(material, 'wireframe')
-gui.add(parameters, 'spinX')
-gui.add(parameters, 'spinY')
+// Geometry
+const particlesGeometry = new THREE.BufferGeometry()
+const count = 5000
+const positions = new Float32Array(count * 3)
+const colors = new Float32Array(count * 3)
 
+for(let i = 0; i < count * 3; i++)
+{
+    positions[i] = (Math.random() - 0.5) * 10
+    colors[i] = Math.random()
+}
+
+particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+
+// Material
+const particlesMaterial = new THREE.PointsMaterial()
+particlesMaterial.size = 0.1
+particlesMaterial.sizeAttenuation = true
+// particlesMaterial.color = new THREE.Color('#ff88cc')
+// particlesMaterial.map = particleTexture
+particlesMaterial.transparent = true
+particlesMaterial.alphaMap = particleTexture
+// particlesMaterial.alphaTest = 0.001
+particlesMaterial.depthTest = false
+particlesMaterial.vertexColors = true
+
+// Points
+const particles = new THREE.Points(particlesGeometry, particlesMaterial)
+scene.add(particles)
 
 /**
  * Sizes
@@ -101,9 +83,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 1
-camera.position.y = 1
-camera.position.z = 1
+camera.position.z = 3
 scene.add(camera)
 
 // Controls
@@ -128,15 +108,14 @@ const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
 
+    // Update particles
+    particles.rotation.x = elapsedTime * 0.2
+
     // Update controls
     controls.update()
 
     // Render
     renderer.render(scene, camera)
-
-    // Update objects
-    mesh.rotation.y += 0.005
-    camera.lookAt(mesh.position)
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)

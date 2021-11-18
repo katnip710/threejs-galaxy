@@ -1,22 +1,19 @@
-* {
+*
+{
     margin: 0;
     padding: 0;
 }
 
 html,
-body {
+body
+{
     overflow: hidden;
 }
 
-.webgl {
+.webgl
+{
     position: fixed;
     top: 0;
     left: 0;
     outline: none;
-}
-
-.lil-gui {
-	background-color: rgb(83, 190, 240);
-	color: rgb(0, 0, 0);
-	padding: 20px;
 }
