@@ -1,18 +1,9 @@
 {
-  "name": "threejs-galaxy",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "deploy": "vercel --prod"
+  "dependencies": {
+    "lil-gui": "^0.18.1",
+    "three": "^0.151.3"
   },
   "devDependencies": {
-    "vite": "^4.0.4",
-    "vite-plugin-glsl": "^1.0.2"
-  },
-  "dependencies": {
-    "lil-gui": "^0.17.0",
-    "three": "^0.148.0"
+    "vite": "^4.2.1"
   }
+}
