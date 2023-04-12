@@ -172,7 +172,6 @@ async function OimoPhysics() {
 				}
 
 				mesh.instanceMatrix.needsUpdate = true;
-				mesh.computeBoundingSphere();
 
 			} else if ( mesh.isMesh ) {
 
